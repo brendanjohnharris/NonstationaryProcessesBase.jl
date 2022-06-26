@@ -1,0 +1,7 @@
+name = "NonstationaryProcessesBase"
+uuid = "af5f7d59-81cb-4819-a164-3c52f7fc19dd"
+authors = ["brendanjohnharris <brendanjohnharris@gmail.com> and contributors"]
+version = "0.1.0"
+
+[compat]
+julia = "1.6"
