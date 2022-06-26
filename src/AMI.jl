@@ -1,8 +1,6 @@
 using DelayEmbeddings
 using DimensionalData
 import DelayEmbeddings.selfmutualinfo
-using Plots
-
 
 function selfmutualinfo(P::Process, lags; vars=1:length(getX0(P)), kwargs...)
     dt = getsavedt(P)

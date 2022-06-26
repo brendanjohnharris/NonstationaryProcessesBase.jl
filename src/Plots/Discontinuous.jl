@@ -1,4 +1,4 @@
-using Plots
+using StatsPlots.Plots
 
 function Plots.plot(xr, D::Discontinuous; kwargs...)
     Plots.plot(xr, D(xr); kwargs...)

@@ -1,2 +1,4 @@
 [deps]
+NonstationaryProcessesBase = "af5f7d59-81cb-4819-a164-3c52f7fc19dd"
+StatsPlots = "f3b207a7-027a-5e70-b257-86293d7955fd"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

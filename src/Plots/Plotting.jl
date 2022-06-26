@@ -1,6 +1,6 @@
-using StatsPlots
-using StatsPlots.Plots
-using StatsPlots.Plots.PlotMeasures
+using .StatsPlots
+using .StatsPlots.Plots
+using .StatsPlots.Plots.PlotMeasures
 using KernelDensity
 
 function widen(x::Union{Tuple, Vector}, s::Number=0.1)
@@ -73,5 +73,4 @@ end
 include("Animations.jl")
 include("Trajectories.jl")
 include("Spectra.jl")
-include("AMI.jl")
 include("SystemCharacterisation.jl")

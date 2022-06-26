@@ -9,6 +9,7 @@ using FFTW
 using Setfield
 using StatsBase
 
+export seed
 
 function __init__()
     @require BifurcationKit="0f109fa4-8a5d-4b75-95aa-f515264e7665" @eval include("Bifurcations.jl")
@@ -17,8 +18,17 @@ function __init__()
     @require PyPlot="d330b81b-6aea-500a-939a-2ce795aea3ee" @eval include("PyPlotTools.jl")
 end
 
+function seed(theSeed=nothing) # Seed the rng, but return the seed. If no, nothing, or NaN argument, randomly seed rng
+    if isnothing(theSeed)
+        theSeed = abs(Random.rand(Int64))
+    end
+    Random.seed!(theSeed)
+    return theSeed
+end
+
 include("Discontinuous.jl")
 include("ParameterProfiles.jl")
 include("Process.jl")
+include("AMI.jl")
 
 end
