@@ -9,3 +9,8 @@
 /Manifest.toml
 /docs/build/
 data/**
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+docs/build/
+docs/site/
