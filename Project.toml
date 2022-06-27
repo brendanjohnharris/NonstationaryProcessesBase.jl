@@ -20,6 +20,7 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 Tullio = "bc48ee85-29a4-5162-ae0b-a64e1601d4bc"
 
 [compat]
+DelayEmbeddings = "2"
 DimensionalData = "≥0.18"
 Distributions = "0.23 - 0.25"
 FFTW = "1"
