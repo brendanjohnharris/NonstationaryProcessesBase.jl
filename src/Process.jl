@@ -50,7 +50,7 @@ end
 """
     Process(; process=nothing, process_kwargs...)
 Define a `Process` that simulates a given system, specified by `process::Function`, and any simulation parameters (including control parameters, sampling parameters, solver parameters, and some metadata like the date and a simulation ID).
-For a complete list of `process_kwargs`, see [NonstationaryProcesses.fieldguide](@ref).
+For a complete list of `process_kwargs`, see the [`fieldguide`](@ref NonstationaryProcessesBase.fieldguide).
 A `Process` can also be used to create other `Process`es using the syntax `S = (P::Process)(;process_kwargs...)`, which will first copy `P` then update any fields given in `process_kwargs`
 """
 function Process(D::Dict)
@@ -132,21 +132,21 @@ $(formatguide(fieldguide, Process))
 """
 fieldguide = Dict(
     :process => "A `Function` with a method for `Process` types that performs a particular simulation. See [NonstationaryProcesses.jl](https://github.com/brendanjohnharris/NonstationaryProcesses.jl) for examples.",
-    :parameter_profile => "A tuple of `Function`s that describe how each parameter of a system evolves over time. These can be functions, or curried functions of parameters given in `:parameter_profile_parameters`. See [constantParameter](@ref), [Discontinuous](@ref), and [ParameterProfiles](@ref)",
+    :parameter_profile => "A tuple of `Function`s that describe how each parameter of a system evolves over time. These can be functions, or curried functions of parameters given in `:parameter_profile_parameters`. See e.g. [`constantParameter`](@ref ParameterProfiles.constantParameter), [`Discontinuous`](@ref)",
     :parameter_profile_parameters =>"A tuple of parameters (which may also be tuples) for each `:parameter_profile`",
     :X0 => "The initial conditions, given as a vector equal in length to number of variables in the system",
-    :transient_t0 => "The length of time to simulate the system, from the initial conditions `:X0` at `:t0`, that is discarded when retrieving the [timeseries](@ref)",
+    :transient_t0 => "The length of time to simulate the system, from the initial conditions `:X0` at `:t0`, that is discarded when retrieving the [`timeseries`](@ref)",
     :t0 => "The initial time of the simulation, at which the system has the state `:X0`",
     :dt => "The time step of the simulation and solver",
-    :savedt => "The sampling period of the solution's [timeseries](@ref), which must be a multiple of `:dt`",
-    :tmax => "The final time point of the simulation. The duration of the simulation is then `:tmax - :transient_t0`, and the duration of the returned time series is `:tmax - :t0`. See [times](@ref)",
+    :savedt => "The sampling period of the solution's [`timeseries`](@ref), which must be a multiple of `:dt`",
+    :tmax => "The final time point of the simulation. The duration of the simulation is then `:tmax - :transient_t0`, and the duration of the returned time series is `:tmax - :t0`. See [`times`](@ref)",
     :alg => "The algorithm used to solve `DifferentialEquations.jl` processes. See, for example, a lsit of [ODE solvers](https://diffeq.sciml.ai/stable/solvers/ode_solve/)",
     :solver_opts => "A dictionary of additional options passed to the `:alg`. This can include solver tolerances, adaptive timesteps, or the maximum number of iterations. See the [common solver options](https://diffeq.sciml.ai/stable/basics/common_solver_opts/)",
     :solver_rng => "An integer seed for the random number generator, set to a random number by default",
-    :id => "A unique integer ID for a given [Process](@ref)",
-    :date => "The date at which the [Process](@ref) was created",
+    :id => "A unique integer ID for a given [`Process`](@ref)",
+    :date => "The date at which the [`Process`](@ref) was created",
     :solution => "The solution of the simulation in its native format (e.g. an [ODE solution](https://diffeq.sciml.ai/stable/types/ode_types/#SciMLBase.ODESolution))",
-    :varnames => "Dummy names for the variables of a [Process](@ref), defaulting to `[:x, :y, :z, ...]`"
+    :varnames => "Dummy names for the variables of a [`Process`](@ref), defaulting to `[:x, :y, :z, ...]`"
 )
 
 
@@ -162,7 +162,7 @@ function repalias!(D, aliai::Dict)
 end
 
 """
-Solve a [Process](@ref) by calling the `(::Process).process` method.
+Solve a [`Process`](@ref) by calling the `(::Process).process` method.
 """
 function solution!(P::Process) # vars::Tuple=Tuple(1:size(P.X0)[1])
     @debug "Solving for the $(getprocess(P)) process ($(getid(P)))"
@@ -177,7 +177,7 @@ end
 export solution!
 
 """
-Copy then solve a [Process](@ref)
+Copy then solve a [`Process`](@ref)
 """
 function simulate(P::Process)
     P2 = deepcopy(P)
@@ -203,7 +203,7 @@ function timeseries(s::AbstractArray, dim::Union{Vector, UnitRange, Real}=1:size
 end
 
 """
-Return the `:solution` of a [Process](@ref) as a formatted time series, always re-simulating. cf. [timeseries](@ref)
+Return the `:solution` of a [`Process`](@ref) as a formatted time series, always re-simulating. cf. [`timeseries`](@ref)
 """
 function timeseries!(P::Process, dim=1:length(getX0(P)); transient::Bool=false)
     x = timeseries(solution!(P), dim)
@@ -230,7 +230,7 @@ variableDims(T::DimArray) = dims(T, :Variable).val
 
 """
     times(P::Process; transient::Bool=false)
-Return the time indices of a [Process](@ref), optionally including the transient.
+Return the time indices of a [`Process`](@ref), optionally including the transient.
 """
 function times(P::Process; transient::Bool=false)
     if transient
@@ -243,13 +243,13 @@ times(T::DimArray) = dims(T, Ti).val
 export times
 
 """
-Return the profiles of a [Process](@ref) as a vector-outputting function with the form `f(t::Real) -> ::Vector`
+Return the profiles of a [`Process`](@ref) as a vector-outputting function with the form `f(t::Real) -> ::Vector`
 """
 parameter_function(P::Process) = tuplef2ftuple(P.parameter_profile, P.parameter_profile_parameters)
 export parameter_function
 
 """
-Return the profiles of a [Process](@ref) as a vector of scalar-valued functions each with the form `f(t::Real) -> ::Real`
+Return the profiles of a [`Process`](@ref) as a vector of scalar-valued functions each with the form `f(t::Real) -> ::Real`
 """
 function parameter_functions(P::Process)
     if all(isempty.(getps(P)))
@@ -266,7 +266,7 @@ export parameter_functions
 
 """
     parameterseries(P::Process; p=nothing, times_kwargs...)
-Return the profiles of a [Process](@ref) as parameter values at time indices given by [times](@ref).
+Return the profiles of a [`Process`](@ref) as parameter values at time indices given by [`times`](@ref).
 `p` specified the indices of the parameters to return (e.g. 1 or [2, 3]).
 If `p` is a vector, the values will be returned in an nₚ×nₜ matrix.
 """
@@ -298,7 +298,7 @@ for field ∈ keys(process_aliases)
 end
 
 """
-Return the indices of parameter profiles that are not [constant](@ref)
+Return the indices of parameter profiles that are not [`constant`](@ref ParameterProfiles.constantParameter)
 """
 function getvaryingparameters(P::Process)
     fs = getparameter_profile(P)
@@ -325,7 +325,7 @@ end
 export forcemat
 
 """
-Remove a transient from a [Process](@ref) by dropping any time-series values between `:transient_t0` and `:t0`, as well as setting the intitial condition to the value of the solution at `:t0`.
+Remove a transient from a [`Process`](@ref) by dropping any time-series values between `:transient_t0` and `:t0`, as well as setting the intitial condition to the value of the solution at `:t0`.
 """
 function trimtransient(P::Process)
     if !isempty(P.solution)
@@ -337,7 +337,7 @@ function trimtransient(P::Process)
 end
 
 """
-Save the solution of a [Process](@ref) in a given folder. This replaces the `:solution` field of the [Process](@ref) with the location of the saved data, and subsequent calls of [timeseries](@ref) read from this file.
+Save the solution of a [`Process`](@ref) in a given folder. This replaces the `:solution` field of the [`Process`](@ref) with the location of the saved data, and subsequent calls of [`timeseries`](@ref) read from this file.
 """
 function saveTimeseries!(P::Process, folder::String="./", delim::Char=','; transient::Bool=false, fileroot="timeseries")
     X = timeseries(P, transient=transient)
@@ -358,7 +358,7 @@ function gettimeseriesfile(P::Process, folder::String)
 end
 
 """
-Retrieve the solution of a [Process](@ref) as a [DimArray](@ref), starting from `:t0`, at a sampling period of `:save_dt`. Unlike [timeseries!](@ref), this function will solve the [Process](@ref) and populate the `:solution` only if the [Process](@ref) has not yet been simulated.
+Retrieve the solution of a [`Process`](@ref) as a [`DimArray`](https://rafaqz.github.io/DimensionalData.jl/stable/api/#DimensionalData.DimArray), starting from `:t0`, at a sampling period of `:save_dt`. Unlike [`timeseries!`](@ref), this function will solve the [`Process`](@ref) and populate the `:solution` only if the [`Process`](@ref) has not yet been simulated.
 """
 function timeseries(P::Process, dim=1:length(getX0(P)); folder::Union{String, Bool}=(getsolution(P) isa String), kwargs...)
     if folder isa Bool && folder
@@ -387,7 +387,7 @@ end
     updateparam(P::Process, p::Integer, profile::Function)
     updateparam(P, p, value::Union{Number, Tuple, Vector})
     updateparam(P, p, profile, value)
-Copy a [Process](@ref) with a new set of `:parameter_profiles` and `:parameter_profile_parameters`.
+Copy a [`Process`](@ref) with a new set of `:parameter_profiles` and `:parameter_profile_parameters`.
 `p` is an integer specifying which parameter to update, `profile` is the new profile, and `value` contains the new `:parameter_profile_parameters`.
 """
 function updateparam(P::Process, p::Integer, profile, value)

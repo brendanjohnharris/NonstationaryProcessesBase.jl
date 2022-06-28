@@ -15,5 +15,6 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
+        "Parameter profiles" => "parameterprofiles.md",
     ],
 )

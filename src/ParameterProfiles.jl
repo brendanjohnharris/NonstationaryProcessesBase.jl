@@ -1,4 +1,4 @@
-module ParameterProfiles
+@reexport module ParameterProfiles
 
 export  constantParameter, constant,
         heaviside,

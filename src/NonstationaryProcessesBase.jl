@@ -8,8 +8,9 @@ using Tullio
 using FFTW
 using Setfield
 using StatsBase
+using Reexport
 
-export seed
+export seed, ParameterProfiles
 
 function __init__()
     @require BifurcationKit="0f109fa4-8a5d-4b75-95aa-f515264e7665" @eval include("Bifurcations.jl")
@@ -27,7 +28,7 @@ function seed(theSeed=nothing) # Seed the rng, but return the seed. If no, nothi
 end
 
 include("Discontinuous.jl")
-include("ParameterProfiles.jl"); export ParameterProfiles
+include("ParameterProfiles.jl")
 include("Process.jl")
 include("AMI.jl")
 
