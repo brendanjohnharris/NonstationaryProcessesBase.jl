@@ -1,3 +1,23 @@
+module ParameterProfiles
+
+export  constantParameter, constant,
+        heaviside,
+        sigmoid,
+        unitStep,
+        unitsigmoid,
+        unitBump,
+        compositeBump,
+        compositeStep,
+        stepNoise,
+        stepRandomWalk,
+        ramp,
+        rampInterval,
+        rampOn,
+        rampOff,
+        sineWave,
+        triangleWave,
+        lorentzian
+
 """Functions for constructing parameter profiles"""
 constantParameter(offset::Real=0.0) = x -> offset
 export constantParameter
@@ -161,3 +181,6 @@ function lorentzian(A=1.0, Γ=1.0, x₀=0.0, y₀=0.0)
     x -> (A.*γ.^2)./((x.-x₀).^2 .+ γ.^2) + y₀
 end
 export lorentzian
+
+
+end # module

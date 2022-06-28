@@ -27,7 +27,7 @@ function seed(theSeed=nothing) # Seed the rng, but return the seed. If no, nothi
 end
 
 include("Discontinuous.jl")
-include("ParameterProfiles.jl")
+include("ParameterProfiles.jl"); export ParameterProfiles
 include("Process.jl")
 include("AMI.jl")
 
