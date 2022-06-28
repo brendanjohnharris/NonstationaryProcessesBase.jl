@@ -18,3 +18,8 @@ makedocs(;
         "Parameter profiles" => "parameterprofiles.md",
     ],
 )
+
+deploydocs(
+    repo = "github.com/brendanjohnharris/NonstationaryProcessesBase.jl.git",
+    devbranch = "main"
+)
