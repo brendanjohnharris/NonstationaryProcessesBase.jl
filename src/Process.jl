@@ -3,11 +3,6 @@ using DelimitedFiles
 using Dates
 using SciMLBase
 
-"""
-    Process(; process=nothing, process_kwargs...)
-Define a `Process` that simulates a given system, specified by `process::Function`, and any simulation parameters (including control parameters, sampling parameters, solver parameters, and some metadata like the date and a simulation ID).
-For a complete list of `process_kwargs`, see [NonstationaryProcesses.fieldguide](@ref).
-"""
 Base.@kwdef mutable struct Process
     process = nothing
     parameter_profile::Union{Function, Tuple, Array, NTuple} = x->0.0 # Can be a tuple of functions, if the system has more than one parameter
@@ -52,6 +47,12 @@ function defaultvars(x)
     (length(x) <= length(vars) ? vars[1:x] : 1:x)
 end
 
+"""
+    Process(; process=nothing, process_kwargs...)
+Define a `Process` that simulates a given system, specified by `process::Function`, and any simulation parameters (including control parameters, sampling parameters, solver parameters, and some metadata like the date and a simulation ID).
+For a complete list of `process_kwargs`, see [NonstationaryProcesses.fieldguide](@ref).
+A `Process` can also be used to create other `Process`es using the syntax `S = (P::Process)(;process_kwargs...)`, which will first copy `P` then update any fields given in `process_kwargs`
+"""
 function Process(D::Dict)
     for s ∈ setdiff(keys(D), (:date, :solution))
         if D[s] isa String

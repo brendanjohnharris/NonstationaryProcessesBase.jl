@@ -18,8 +18,10 @@ export  constantParameter, constant,
         triangleWave,
         lorentzian
 
-"""Functions for constructing parameter profiles"""
-constantParameter(offset::Real=0.0) = x -> offset
+"""
+A function for creating a constant parameter profile, such that if `f = constantParamter(x)` then `f(x)(t) = x`
+"""
+constantParameter(offset::Real=0.0) = t -> offset
 export constantParameter
 constant = constantParameter
 export constant

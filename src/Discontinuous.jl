@@ -10,7 +10,7 @@ export Discontinuous
 """
      Discontinuous
 
- A type that contains a discontinuous function and an index of any of its discontinuities. This allows the construction of step parameter profiles that retain discontinuity information. You can also call the Discontinuous type like a normal function, if you want to.
+ A type that contains a discontinuous function and an index of any of its discontinuities. This allows the construction of step parameter profiles that retain discontinuity information. You can also call the `Discontinuous`` type like a normal function, if you want to.
 """
 struct Discontinuous <: Function
     f::Function
@@ -36,7 +36,10 @@ end
 
 # ! To use stiff solvers that error about instability with discontinuous profiles, try e.g. Rosenbrock23(autodiff = false) and turning off adaptive timestepping
 
-
+"""
+    tuplef2ftuple(f::Tuple{Function}, params::Tuple)
+Convert a vector of curried functions `f` that each accept an element of the parameter tuple `params` into a function of the form `f(t) -> x::Vector`, where `xᵢ = fᵢ(paramsᵢ)(t)` for `i = 1:length(f)`
+"""
 function tuplef2ftuple(f, params)
     # turn a tuple of functions into a function of tuples
     if all(isempty.(params)) # The f's are just functions on their own, no need to add parameters
