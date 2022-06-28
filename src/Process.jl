@@ -3,6 +3,8 @@ using DelimitedFiles
 using Dates
 using SciMLBase
 
+export Process, process_aliases, fieldguide
+
 Base.@kwdef mutable struct Process
     process = nothing
     parameter_profile::Union{Function, Tuple, Array, NTuple} = x->0.0 # Can be a tuple of functions, if the system has more than one parameter
@@ -80,9 +82,9 @@ function (P::Process)(;kwargs...)
     repalias!(kwargs, process_aliases)
 
     # * If the parameter profile is given as a number, assume this is a stationary process
-    if :parameter_profile ∈ keys(kwargs) && !(:parameter_profile_parameters ∈ keys(kwargs)) && kwargs[:parameter_profile] isa Number
-        kwargs[:parameter_profile] = Tuple([x->y for y in kwargs[:parameter_profile]])
-        kwargs[:parameter_profile_parameters] = ()
+    if :parameter_profile ∈ keys(kwargs) && !(:parameter_profile_parameters ∈ keys(kwargs)) && kwargs[:parameter_profile] isa Union{Number, Vector{<:Number}}
+        kwargs[:parameter_profile_parameters] = Tuple([y for y in kwargs[:parameter_profile]])
+        kwargs[:parameter_profile] = Tuple([constant for y in kwargs[:parameter_profile]])
     end
 
     # * Copy kwargs onto a new Process
@@ -96,7 +98,6 @@ function (P::Process)(;kwargs...)
     setfield!(P2, :date, string(Dates.now())) # New datetime, yeah?
     return P2
 end
-export Process
 
 """
 Field aliases for `Process` constructors, given as a dictionary of `(field=>alias)` pairs.
@@ -165,12 +166,9 @@ end
 Solve a [`Process`](@ref) by calling the `(::Process).process` method.
 """
 function solution!(P::Process) # vars::Tuple=Tuple(1:size(P.X0)[1])
-    @debug "Solving for the $(getprocess(P)) process ($(getid(P)))"
-    P.solution = P.process(P)
-end
-function solution(P::Process)
     if isnothing(P.solution)
-        solution!(P)
+        @debug "Solving for the $(getprocess(P)) process ($(getid(P)))"
+        P.solution = P.process(P)
     end
     return P.solution
 end
@@ -184,7 +182,7 @@ function simulate(P::Process)
     solution!(P2)
     return P2
 end
-simulate!(P::Process) = (solution!(P); nothing)
+simulate!(P::Process) = (P.solution = nothing; solution!(P); nothing)
 export simulate
 export simulate!
 
@@ -203,9 +201,10 @@ function timeseries(s::AbstractArray, dim::Union{Vector, UnitRange, Real}=1:size
 end
 
 """
-Return the `:solution` of a [`Process`](@ref) as a formatted time series, always re-simulating. cf. [`timeseries`](@ref)
+Return the `:solution` of a [`Process`](@ref) as a formatted time series. cf. [`timeseries`](@ref)
 """
 function timeseries!(P::Process, dim=1:length(getX0(P)); transient::Bool=false)
+    # P.solution = nothing
     x = timeseries(solution!(P), dim)
     if transient
         idxs = 1:length(times(P, transient=true))
@@ -358,7 +357,7 @@ function gettimeseriesfile(P::Process, folder::String)
 end
 
 """
-Retrieve the solution of a [`Process`](@ref) as a [`DimArray`](https://rafaqz.github.io/DimensionalData.jl/stable/api/#DimensionalData.DimArray), starting from `:t0`, at a sampling period of `:save_dt`. Unlike [`timeseries!`](@ref), this function will solve the [`Process`](@ref) and populate the `:solution` only if the [`Process`](@ref) has not yet been simulated.
+Retrieve the solution of a [`Process`](@ref) as a [`DimArray`](https://rafaqz.github.io/DimensionalData.jl/stable/api/#DimensionalData.DimArray), starting from `:t0`, at a sampling period of `:save_dt`. This function will solve the [`Process`](@ref) and populate the `:solution` only if the [`Process`](@ref) has not yet been simulated.
 """
 function timeseries(P::Process, dim=1:length(getX0(P)); folder::Union{String, Bool}=(getsolution(P) isa String), kwargs...)
     if folder isa Bool && folder
