@@ -13,14 +13,14 @@ export widen
 #                          Plot recipe for Process types (e.g. label axes)                         #
 # ------------------------------------------------------------------------------------------------ #
 
-@recipe function f(P::Process; vars=1:size(P.X0)[1], transient=false, downsample=1, colormode=nothing)
+@recipe function f(P::Process; vars=1:size(P.X0)[1], transient=false, downsample=1, colormode=nothing, N = 10000*downsample) # Set N so we don't try to plot any massive trajectories
     cmode = colormode
     linecolor --> :black
     markercolor --> :black
-
+    t = times(P, transient=transient)
+    N = min(N, length(t))
     if length(vars) == 1
-        t = times(P, transient=transient)
-        x = (t, timeseries(P, vars, transient=transient))
+        x = (t, timeseries(P, vars, transient=transient)[1:N])
         seriestype --> :path
         xguide --> "t"
         yguide --> "x"
@@ -31,7 +31,7 @@ export widen
             vars = vars[1:3] # Can only plot in 3d
         end
         x = deepcopy(timeseries(P, vars, transient=transient))
-        x = Tuple([x[:, i] for i in 1:size(x)[2]])
+        x = Tuple([x[1:N, i] for i in 1:size(x)[2]])
         if cmode != :velocity
             seriestype --> :scatter
             markersize --> 1
