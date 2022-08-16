@@ -1,5 +1,6 @@
 @reexport module ParameterProfiles
 
+import ..Discontinuous
 export  constantParameter, constant,
         heaviside,
         sigmoid,
