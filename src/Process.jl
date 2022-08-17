@@ -323,9 +323,6 @@ function forcemat(x)
 end
 export forcemat
 
-"""
-Remove a transient from a [`Process`](@ref) by dropping any time-series values between `:transient_t0` and `:t0`, as well as setting the intitial condition to the value of the solution at `:t0`.
-"""
 function trimtransient(P::Process)
     if !isempty(P.solution)
         P.solution = timeseries(P, transient=false)
@@ -334,6 +331,11 @@ function trimtransient(P::Process)
     P.transient_t0 = P.t0
     return P
 end
+
+"""
+Remove a transient from a [`Process`](@ref) by dropping any time-series values between `:transient_t0` and `:t0`, as well as setting the intitial condition to the value of the solution at `:t0`.
+"""
+trimtransient! = trimtransient; export trimtransient!
 
 """
 Save the solution of a [`Process`](@ref) in a given folder. This replaces the `:solution` field of the [`Process`](@ref) with the location of the saved data, and subsequent calls of [`timeseries`](@ref) read from this file.
@@ -390,8 +392,8 @@ Copy a [`Process`](@ref) with a new set of `:parameter_profiles` and `:parameter
 `p` is an integer specifying which parameter to update, `profile` is the new profile, and `value` contains the new `:parameter_profile_parameters`.
 """
 function updateparam(P::Process, p::Integer, profile, value)
-    profiles = [getparameter_profile(P)...]
-    values = [getparameter_profile_parameters(P)...]
+    profiles = getparameter_profile(P) |> tuple
+    values = getparameter_profile_parameters(P) |> tuple
     if length(profiles) == 1
         @assert p == 1
         profiles = [profile]

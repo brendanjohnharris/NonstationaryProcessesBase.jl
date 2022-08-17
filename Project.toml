@@ -1,7 +1,7 @@
 name = "NonstationaryProcessesBase"
 uuid = "af5f7d59-81cb-4819-a164-3c52f7fc19dd"
 authors = ["brendanjohnharris <brendanjohnharris@gmail.com> and contributors"]
-version = "0.1.0"
+version = "0.2.0"
 
 [deps]
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
