@@ -52,7 +52,7 @@ function tuplef2ftuple(f, params)
             pp = f
         end
         return pp
-    elseif f isa Tuple{<:Function} || f isa Vector{<:Function}
+    elseif eltype(f) <: Function
         ps = Vector{Function}(undef, length(f))
         for i = 1:length(f)
             ps[i] = f[i](params[i]...)
