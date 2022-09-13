@@ -392,8 +392,8 @@ Copy a [`Process`](@ref) with a new set of `:parameter_profiles` and `:parameter
 `p` is an integer specifying which parameter to update, `profile` is the new profile, and `value` contains the new `:parameter_profile_parameters`.
 """
 function updateparam(P::Process, p::Integer, profile, value)
-    profiles = getparameter_profile(P) |> tuple
-    values = getparameter_profile_parameters(P) |> tuple
+    profiles = getparameter_profile(P) |> Tuple
+    values = getparameter_profile_parameters(P) |> Tuple
     if length(profiles) == 1
         @assert p == 1
         profiles = [profile]
