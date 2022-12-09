@@ -44,7 +44,7 @@ function tuplef2ftuple(f, params)
     # turn a tuple of functions into a function of tuples
     if all(isempty.(params)) # The f's are just functions on their own, no need to add parameters
         # Be warned that you can't mix these; either use all parameter functions, or all standard functions. Don't be greedy.
-        if f isa Tuple{<:Function} || f isa Vector{<:Function}
+        if eltype(f) <: Function
             ds = [fi isa Discontinuous ? fi.d : [] for fi in f]
             ds = reduce(∪, ds) |> Set
             pp = Discontinuous(t->[x(t) for x in f], ds)
