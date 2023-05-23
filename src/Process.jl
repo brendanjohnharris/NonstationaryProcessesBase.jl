@@ -231,14 +231,13 @@ variableDims(T::DimArray) = dims(T, :Variable).val
     times(P::Process; transient::Bool=false)
 Return the time indices of a [`Process`](@ref), optionally including the transient.
 """
-function times(P::Process; transient::Bool=false)
+function TimeseriesTools.times(P::Process; transient::Bool=false)
     if transient
         P.transient_t0:P.savedt:P.tmax
     else
         P.t0:P.savedt:P.tmax
     end
 end
-times(T::DimArray) = dims(T, Ti).val
 export times
 
 """
