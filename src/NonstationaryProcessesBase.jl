@@ -9,7 +9,7 @@ using FFTW
 using Setfield
 using StatsBase
 using Reexport
-using TimeseriesTools
+import TimeseriesTools
 
 export seed, ParameterProfiles
 
