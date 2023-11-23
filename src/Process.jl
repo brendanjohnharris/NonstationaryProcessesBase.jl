@@ -217,7 +217,7 @@ function timeseries!(P::Process, dim=1:length(getX0(P)); transient::Bool=false)
     saveTimes = (P.transient_t0:P.savedt:P.tmax)[idxs]
     namevars = P.varnames[dim]
     if size(x, 2) > 1
-        x = DimArray(x[idxs, :], (Ti(saveTimes), Dim{:Variable}(namevars)))
+        x = DimArray(x[idxs, :], (Ti(saveTimes), TimeseriesTools.Var(namevars)))
     else
         x = DimArray(x[idxs], (Ti(saveTimes),))
     end
