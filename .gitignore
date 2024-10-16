@@ -6,7 +6,7 @@
 *.jld2
 *.mat
 *.parquet
-/Manifest.toml
+Manifest.toml
 /docs/build/
 data/**
 *.jl.cov

@@ -9,16 +9,16 @@ export Process, process_aliases, fieldguide
 
 Base.@kwdef mutable struct Process
     process = nothing
-    parameter_profile::Union{Function, Tuple, Array, NTuple} = x->0.0 # Can be a tuple of functions, if the system has more than one parameter
+    parameter_profile::Union{Function,Tuple,Array,NTuple} = x -> 0.0 # Can be a tuple of functions, if the system has more than one parameter
     parameter_profile_parameters = [] # Can be a tuple of tuples
     X0::Vector = [nothing]
-    t0::Union{Float64, Int64} = 0.0
-    transient_t0::Union{Float64, Int64} = t0 # t0 will always take precedence
-    dt::Union{Float64, Int64} = 0.001
-    savedt::Union{Float64, Int64} = 0.01
-    tmax::Union{Float64, Int64} = 100.0
-    alg::Union{SciMLBase.SciMLAlgorithm, Function, Nothing} = nothing
-    solver_opts::Dict = Dict(:adaptive=>false)
+    t0::Union{Float64,Int64} = 0.0
+    transient_t0::Union{Float64,Int64} = t0 # t0 will always take precedence
+    dt::Union{Float64,Int64} = 0.001
+    savedt::Union{Float64,Int64} = 0.01
+    tmax::Union{Float64,Int64} = 100.0
+    alg::Union{SciMLBase.SciMLAlgorithm,Function,Nothing} = nothing
+    solver_opts::Dict = Dict(:adaptive => false)
     #parameter_rng::UInt64 = seed()
     solver_rng::Int64 = seed()
     id::Int64 = abs(rand(Int64)) # Just a unique number for this simulation
@@ -28,10 +28,10 @@ Base.@kwdef mutable struct Process
 end
 
 function subshow(io, P)
-    namelen = maximum(length.(string.((fieldnames∘typeof)(P)))) + 2
-    fillfun = x -> repeat(" ", namelen-length(string(x)))
-    showfields = (fieldnames∘typeof)(P)
-    rows = ["   $x:$(fillfun(x))"*string(getfield(P, x))*"\n" for x ∈ showfields]
+    namelen = maximum(length.(string.((fieldnames ∘ typeof)(P)))) + 2
+    fillfun = x -> repeat(" ", namelen - length(string(x)))
+    showfields = (fieldnames ∘ typeof)(P)
+    rows = ["   $x:$(fillfun(x))" * string(getfield(P, x)) * "\n" for x ∈ showfields]
     issolved = !isnothing(getsolution(P))
     rows[findfirst(showfields .== :solution)] = "   solution:$(fillfun(:solution))$issolved\n"
     print(io, reduce(*, rows))
@@ -75,16 +75,16 @@ function Process(D::Dict)
             end
         end
     end
-    Process(;D...)
+    Process(; D...)
 end
 
-function (P::Process)(;kwargs...)
+function (P::Process)(; kwargs...)
     # Can use field aliases here
-    kwargs = Dict{Any, Any}(kwargs)
+    kwargs = Dict{Any,Any}(kwargs)
     repalias!(kwargs, process_aliases)
 
     # * If the parameter profile is given as a number, assume this is a stationary process
-    if :parameter_profile ∈ keys(kwargs) && !(:parameter_profile_parameters ∈ keys(kwargs)) && kwargs[:parameter_profile] isa Union{Number, Vector{<:Number}}
+    if :parameter_profile ∈ keys(kwargs) && !(:parameter_profile_parameters ∈ keys(kwargs)) && kwargs[:parameter_profile] isa Union{Number,Vector{<:Number}}
         kwargs[:parameter_profile_parameters] = Tuple([y for y in kwargs[:parameter_profile]])
         kwargs[:parameter_profile] = Tuple([constant for y in kwargs[:parameter_profile]])
     end
@@ -105,26 +105,26 @@ end
 Field aliases for `Process` constructors, given as a dictionary of `(field=>alias)` pairs.
 """
 process_aliases = Dict(
-    :process =>                     [:sim, :system, :processes],
-    :parameter_profile =>           [:profile, :profiles, :𝑝, :𝑃, :parameter_profiles],
-    :parameter_profile_parameters =>[:parameters, :ps, :params, :param, :parameter,
-                                     :profile_parameters, :parameterprofileparameters,
-                                     :profileparameters, :𝔓, :𝔭],
-    :X0 =>                          [:initial_conditions, :X, :X_0, :X₀, :𝑥₀, :𝑋₀, :𝑥0,
-                                     :𝑋0],
-    :transient_t0 =>                [:transient, :cutoff, :tₜ, :𝑡ₜ, :tt],
-    :t0 =>                          [:tstart, :t₀, :𝑡₀],
-    :dt =>                          [:δt, :𝛿t, :δ𝑡, :𝛿𝑡],
-    :savedt =>                      [:save_dt, :save_Δt, :save_δt, :save_𝛥t, :save_𝛿t, :save_Δ𝑡,
-                                     :save_δ𝑡, :save_𝛥𝑡, :save_𝛿𝑡, :Δt, :𝛥t, :Δ𝑡, :Δ𝑡],
-    :tmax =>                        [:t_max, :T, :Tmax, :T_max, :𝑇],
-    :alg =>                         [:algorithm, :solver],
-    :solver_opts =>                 [:opts, :solopts, :sol_opts, :solveropts],
-    :solver_rng =>                  [:rng, :rngseed, :rng_seed, :solverrng],
-    :id =>                          [:identifier, :inventory_id],
-    :date =>                        [:time, :datetime],
-    :solution =>                    [:sol, :result, :output],
-    :varnames =>                    [:variables, :variablenames, :variable_names]
+    :process => [:sim, :system, :processes],
+    :parameter_profile => [:profile, :profiles, :𝑝, :𝑃, :parameter_profiles],
+    :parameter_profile_parameters => [:parameters, :ps, :params, :param, :parameter,
+        :profile_parameters, :parameterprofileparameters,
+        :profileparameters, :𝔓, :𝔭],
+    :X0 => [:initial_conditions, :X, :X_0, :X₀, :𝑥₀, :𝑋₀, :𝑥0,
+        :𝑋0],
+    :transient_t0 => [:transient, :cutoff, :tₜ, :𝑡ₜ, :tt],
+    :t0 => [:tstart, :t₀, :𝑡₀],
+    :dt => [:δt, :𝛿t, :δ𝑡, :𝛿𝑡],
+    :savedt => [:save_dt, :save_Δt, :save_δt, :save_𝛥t, :save_𝛿t, :save_Δ𝑡,
+        :save_δ𝑡, :save_𝛥𝑡, :save_𝛿𝑡, :Δt, :𝛥t, :Δ𝑡, :Δ𝑡],
+    :tmax => [:t_max, :T, :Tmax, :T_max, :𝑇],
+    :alg => [:algorithm, :solver],
+    :solver_opts => [:opts, :solopts, :sol_opts, :solveropts],
+    :solver_rng => [:rng, :rngseed, :rng_seed, :solverrng],
+    :id => [:identifier, :inventory_id],
+    :date => [:time, :datetime],
+    :solution => [:sol, :result, :output],
+    :varnames => [:variables, :variablenames, :variable_names]
 )
 
 formatguide(x, P::Type) = reduce(*, ["- `$key`: $(x[key])\n" for key in fieldnames(P)])
@@ -136,7 +136,7 @@ $(formatguide(fieldguide, Process))
 fieldguide = Dict(
     :process => "A `Function` with a method for `Process` types that performs a particular simulation. See [NonstationaryProcesses.jl](https://github.com/brendanjohnharris/NonstationaryProcesses.jl) for examples.",
     :parameter_profile => "A tuple of `Function`s that describe how each parameter of a system evolves over time. These can be functions, or curried functions of parameters given in `:parameter_profile_parameters`. See e.g. [`constantParameter`](@ref ParameterProfiles.constantParameter), [`Discontinuous`](@ref)",
-    :parameter_profile_parameters =>"A tuple of parameters (which may also be tuples) for each `:parameter_profile`",
+    :parameter_profile_parameters => "A tuple of parameters (which may also be tuples) for each `:parameter_profile`",
     :X0 => "The initial conditions, given as a vector equal in length to number of variables in the system",
     :transient_t0 => "The length of time to simulate the system, from the initial conditions `:X0` at `:t0`, that is discarded when retrieving the [`timeseries`](@ref)",
     :t0 => "The initial time of the simulation, at which the system has the state `:X0`",
@@ -190,8 +190,8 @@ export simulate!
 
 # * Might have various solution types, so timeseries gets all of them as an array
 TimeSeries(s::SciMLBase.AbstractTimeseriesSolution, dim::Real) = s[dim, :]
-TimeSeries(s::SciMLBase.AbstractTimeseriesSolution, dim::Union{Vector, UnitRange}=1:size(s.u[1], 1)) = copy(s[dim, :]')
-function TimeSeries(s::AbstractArray, dim::Union{Vector, UnitRange, Real}=1:size(s, 2))
+TimeSeries(s::SciMLBase.AbstractTimeseriesSolution, dim::Union{Vector,UnitRange}=1:size(s.u[1], 1)) = copy(s[dim, :]')
+function TimeSeries(s::AbstractArray, dim::Union{Vector,UnitRange,Real}=1:size(s, 2))
     if s isa Vector
         if length(dim) != 1 || dim[1] != 1
             error("Cannot index the second dimension of the input, which is a vector")
@@ -217,15 +217,15 @@ function timeseries!(P::Process, dim=1:length(getX0(P)); transient::Bool=false)
     saveTimes = (P.transient_t0:P.savedt:P.tmax)[idxs]
     namevars = P.varnames[dim]
     if size(x, 2) > 1
-        x = DimArray(x[idxs, :], (Ti(saveTimes), TimeseriesTools.Var(namevars)))
+        x = ToolsArray(x[idxs, :], (𝑡(saveTimes), TimeseriesTools.Var(namevars)))
     else
-        x = DimArray(x[idxs], (Ti(saveTimes),))
+        x = ToolsArray(x[idxs], (𝑡(saveTimes),))
     end
 end
 export timeseries
 
-timeDims(T::DimArray) = dims(T, Ti).val
-variableDims(T::DimArray) = dims(T, :Variable).val
+timeDims(T::ToolsArray) = dims(T, 𝑡).val
+variableDims(T::ToolsArray) = dims(T, :Variable).val
 # function timeseries(s::Tuple, dim::Union{Real, Vector, Tuple}=1)
 #     timeseries(s[1], dim) # You gave the metadata as well
 # end
@@ -256,7 +256,7 @@ function parameter_functions(P::Process)
     if all(isempty.(getps(P)))
         getprofiles(P)
     else
-        if P.parameter_profile isa Union{Tuple, Vector}
+        if P.parameter_profile isa Union{Tuple,Vector}
             [P.parameter_profile[x](P.parameter_profile_parameters[x]...) for x in 1:length(P.parameter_profile)]
         else
             P.parameter_profile(P.parameter_profile_parameters...)
@@ -288,12 +288,13 @@ export parameterseries
 for field ∈ keys(process_aliases)
     f = Symbol(:get, field)
     eval(quote
-        $f(P::Process) = P.$field; export $f
+        $f(P::Process) = P.$field
+        export $f
     end)
     for field_alias ∈ process_aliases[field]
         fa = Symbol(:get, field_alias)
         eval(quote
-            $fa = $f; #export fa
+            $fa = $f #export fa
         end)
     end
 end
@@ -309,7 +310,7 @@ end
 export getvaryingparameters
 
 function forcevec(x)
-    if !(x isa Union{AbstractArray, Tuple})
+    if !(x isa Union{AbstractArray,Tuple})
         x = [x]
     else
         x
@@ -327,7 +328,7 @@ export forcemat
 
 function trimtransient(P::Process)
     if !isempty(P.solution)
-        P.solution = timeseries(P, transient=false)
+        P.solution = parent(timeseries(P, transient=false))
         P.X0 = P.solution[1, :] # If you want to resimulate, start at this point. Assumes the entire description of the system is contained in time and position, which is not unreasonable
     end
     P.transient_t0 = P.t0
@@ -337,7 +338,8 @@ end
 """
 Remove a transient from a [`Process`](@ref) by dropping any time-series values between `:transient_t0` and `:t0`, as well as setting the intitial condition to the value of the solution at `:t0`.
 """
-trimtransient! = trimtransient; export trimtransient!
+trimtransient! = trimtransient;
+export trimtransient!
 
 """
 Save the solution of a [`Process`](@ref) in a given folder. This replaces the `:solution` field of the [`Process`](@ref) with the location of the saved data, and subsequent calls of [`timeseries`](@ref) read from this file.
@@ -348,7 +350,7 @@ function saveTimeseries!(P::Process, folder::String="./", delim::Char=','; trans
     if !transient
         P = trimtransient(P)
     end
-    filename = joinpath(folder, fileroot*"_"*string(getid(P))*".csv")
+    filename = joinpath(folder, fileroot * "_" * string(getid(P)) * ".csv")
     P.solution = abspath(folder)
     #P.solution = nothing
     # @info "Saving time-series data to $filename"
@@ -357,13 +359,13 @@ end
 export saveTimeseries!
 
 function gettimeseriesfile(P::Process, folder::String)
-    filename = filter(x->occursin("timeseries_"*string(getid(P)), x), readdir(folder))
+    filename = filter(x -> occursin("timeseries_" * string(getid(P)), x), readdir(folder))
 end
 
 """
-Retrieve the solution of a [`Process`](@ref) as a [`DimArray`](https://rafaqz.github.io/DimensionalData.jl/stable/api/#DimensionalData.DimArray), starting from `:t0`, at a sampling period of `:save_dt`. This function will solve the [`Process`](@ref) and populate the `:solution` only if the [`Process`](@ref) has not yet been simulated.
+Retrieve the solution of a [`Process`](@ref) as a [`ToolsArray`](https://rafaqz.github.io/DimensionalData.jl/stable/api/#DimensionalData.ToolsArray), starting from `:t0`, at a sampling period of `:save_dt`. This function will solve the [`Process`](@ref) and populate the `:solution` only if the [`Process`](@ref) has not yet been simulated.
 """
-function TimeSeries(P::Process, dim=1:length(getX0(P)); folder::Union{String, Bool}=(getsolution(P) isa String), kwargs...)
+function TimeSeries(P::Process, dim=1:length(getX0(P)); folder::Union{String,Bool}=(getsolution(P) isa String), kwargs...)
     if folder isa Bool && folder
         if getsolution(P) isa String
             folder = getsolution(P)
@@ -386,6 +388,11 @@ function TimeSeries(P::Process, dim=1:length(getX0(P)); folder::Union{String, Bo
     return timeseries!(P, dim; kwargs...)
 end
 
+flat_tuple(x::Tuple)::Tuple = x
+flat_tuple(x::AbstractVector)::Tuple = Tuple(x)
+flat_tuple(x::Function)::Tuple{Function} = (x,)
+
+
 """
     updateparam(P::Process, p::Integer, profile::Function)
     updateparam(P, p, value::Union{Number, Tuple, Vector})
@@ -394,8 +401,8 @@ Copy a [`Process`](@ref) with a new set of `:parameter_profiles` and `:parameter
 `p` is an integer specifying which parameter to update, `profile` is the new profile, and `value` contains the new `:parameter_profile_parameters`.
 """
 function updateparam(P::Process, p::Integer, profile, value)
-    profiles = getparameter_profile(P) |> Tuple
-    values = getparameter_profile_parameters(P) |> Tuple
+    profiles = getparameter_profile(P) |> flat_tuple
+    values = getparameter_profile_parameters(P) |> flat_tuple
     if length(profiles) == 1
         @assert p == 1
         profiles = [profile]
@@ -412,7 +419,7 @@ function updateparam(P::Process, p::Integer, profile::Function)
     value = (length(profiles) == 1 && p == 1) ? value : value[p]
     return updateparam(P, p, profile, value)
 end
-function updateparam(P::Process, p::Integer, value::Union{Number, Tuple, Vector})
+function updateparam(P::Process, p::Integer, value::Union{Number,Tuple,Vector})
     profile = getparameter_profile(P)
     profile = (length(profile) == 1 && p == 1) ? profile : profile[p]
     return updateparam(P, p, profile, value)
