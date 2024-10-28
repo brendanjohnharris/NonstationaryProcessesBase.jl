@@ -1,19 +1,6 @@
 using .DynamicalSystems
 import .DynamicalSystems: lyapunov, lyapunovspectrum
 
-"""
-Whip up a DynamicalSystem from a Process
-"""
-function process2ds(P::Process)
-    prob = process2problem(P)
-    if getalg(P) isa FunctionMap
-        d = DiscreteDynamicalSystem(prob.f, prob.u0, prob.p)
-    else
-        d = ContinuousDynamicalSystem(prob)
-    end
-end
-export process2ds
-
 
 """
 Calculate the largest lyapunov exponent of a process
@@ -40,7 +27,7 @@ export lyapunovspectrum
 """Calculate the largest lyapunov exponent as a function of a parameter"""
 function lyapunovresponse(P::Process, p, prange, N=1000, k=length(getX0(P)))
     d = process2ds(P)
-    λs = Array{Float64, 2}(undef, length(prange), k)
+    λs = Array{Float64,2}(undef, length(prange), k)
     Threads.@threads for ip ∈ 1:length(prange)
         subP = updateparam(P, p, constantParameter, prange[ip])
         if k == 1 && !(d isa DiscreteDynamicalSystem)
