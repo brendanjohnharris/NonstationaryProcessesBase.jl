@@ -1,7 +1,7 @@
 name = "NonstationaryProcessesBase"
 uuid = "af5f7d59-81cb-4819-a164-3c52f7fc19dd"
 authors = ["brendanjohnharris <brendanjohnharris@gmail.com> and contributors"]
-version = "0.2.2"
+version = "0.2.3"
 
 [deps]
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
@@ -24,7 +24,7 @@ Tullio = "bc48ee85-29a4-5162-ae0b-a64e1601d4bc"
 [compat]
 DelayEmbeddings = "2"
 DelimitedFiles = "1.9"
-DimensionalData = "0.27, 0.28"
+DimensionalData = "0.27, 0.28, 0.29"
 Distributions = "0.23, 0.24, 0.25"
 FFTW = "1"
 KernelDensity = "0.6"
