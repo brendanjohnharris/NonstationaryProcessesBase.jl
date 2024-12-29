@@ -209,7 +209,9 @@ Return the `:solution` of a [`Process`](@ref) as a formatted time series. cf. [`
 function timeseries!(P::Process, dim=1:length(getX0(P)); transient::Bool=false)
     # P.solution = nothing
     x = timeseries(solution!(P), dim)
-    maxn = min(length(times(P, transient=true)), size(x, 1)) # Number of samples
+    maxn = length(times(P, transient=true))
+    badn = maxn - size(x, 1)
+    x = vcat(x, fill(NaN, badn, size(x, 2)))
     if transient
         idxs = 1:maxn
     else
