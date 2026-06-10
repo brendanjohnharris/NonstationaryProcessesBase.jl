@@ -3,6 +3,20 @@ import .DynamicalSystems: lyapunov, lyapunovspectrum
 
 
 """
+Whip up a DynamicalSystem from a Process
+"""
+function process2ds(P::Process)
+    prob = process2problem(P)
+    if prob isa DiscreteProblem
+        d = DiscreteDynamicalSystem(prob.f, prob.u0, prob.p)
+    else
+        d = ContinuousDynamicalSystem(prob)
+    end
+end
+export process2ds
+
+
+"""
 Calculate the largest lyapunov exponent of a process
 """
 function lyapunov(P::Process)

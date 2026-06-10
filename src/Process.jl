@@ -2,10 +2,19 @@ using DimensionalData
 using DelimitedFiles
 using Dates
 using SciMLBase
-import TimeseriesTools.TimeSeries
-import TimeseriesTools.times
+import TimeseriesBase: Timeseries, times
 
 export Process, process_aliases, fieldguide
+
+# Generic solve interface. Methods are provided by a downstream simulation package
+# (e.g. NonstationaryProcesses, which depends on OrdinaryDiffEq); declared here as
+# stubs so consumers can extend the same functions and so process2ds
+# (src/DynamicalSystems.jl) can call process2problem.
+function dsolve end
+function odeproblem end
+function process2problem end
+function process2solution end
+export dsolve, odeproblem, process2problem, process2solution
 
 Base.@kwdef mutable struct Process
     process = nothing
@@ -17,7 +26,7 @@ Base.@kwdef mutable struct Process
     dt::Union{Float64,Int64} = 0.001
     savedt::Union{Float64,Int64} = 0.01
     tmax::Union{Float64,Int64} = 100.0
-    alg::Union{SciMLBase.SciMLAlgorithm,Function,Nothing} = nothing
+    alg::Union{SciMLBase.AbstractSciMLAlgorithm,Function,Nothing} = nothing
     solver_opts::Dict = Dict(:adaptive => false)
     #parameter_rng::UInt64 = seed()
     solver_rng::Int64 = seed()
@@ -189,9 +198,9 @@ export simulate
 export simulate!
 
 # * Might have various solution types, so timeseries gets all of them as an array
-TimeSeries(s::SciMLBase.AbstractTimeseriesSolution, dim::Real) = s[dim, :]
-TimeSeries(s::SciMLBase.AbstractTimeseriesSolution, dim::Union{Vector,UnitRange}=1:size(s.u[1], 1)) = copy(s[dim, :]')
-function TimeSeries(s::AbstractArray, dim::Union{Vector,UnitRange,Real}=1:size(s, 2))
+timeseries(s::SciMLBase.AbstractTimeseriesSolution, dim::Real) = s[dim, :]
+timeseries(s::SciMLBase.AbstractTimeseriesSolution, dim::Union{Vector,UnitRange}=1:size(s.u[1], 1)) = copy(s[dim, :]')
+function timeseries(s::AbstractArray, dim::Union{Vector,UnitRange,Real}=1:size(s, 2))
     if s isa Vector
         if length(dim) != 1 || dim[1] != 1
             error("Cannot index the second dimension of the input, which is a vector")
@@ -201,7 +210,16 @@ function TimeSeries(s::AbstractArray, dim::Union{Vector,UnitRange,Real}=1:size(s
         s[:, dim]
     end
 end
-timeseries = TimeseriesTools.TimeSeries
+timeseries(args...; kwargs...) = TimeseriesBase.Timeseries(args...; kwargs...)
+
+function Base.Dict(P::Process; trim=true)
+    if trim == true
+        trim = [:solution]
+    elseif trim == false
+        trim = []
+    end
+    Dict(fn => getfield(P, fn) for fn ∈ fieldnames(typeof(P)) if !(fn ∈ trim))
+end
 
 """
 Return the `:solution` of a [`Process`](@ref) as a formatted time series. cf. [`timeseries`](@ref)
@@ -220,15 +238,15 @@ function timeseries!(P::Process, dim=1:length(getX0(P)); transient::Bool=false)
     saveTimes = (P.transient_t0:P.savedt:P.tmax)[idxs]
     namevars = P.varnames[dim]
     if size(x, 2) > 1
-        x = ToolsArray(x[idxs, :], (𝑡(saveTimes), TimeseriesTools.Var(namevars)))
+        x = ToolsArray(x[idxs, :], (𝑡(saveTimes), TimeseriesBase.Var(namevars)); metadata=Dict(P))
     else
-        x = ToolsArray(x[idxs], (𝑡(saveTimes),))
+        x = ToolsArray(x[idxs], (𝑡(saveTimes),); metadata=Dict(P))
     end
 end
 export timeseries
 
 timeDims(T::ToolsArray) = dims(T, 𝑡).val
-variableDims(T::ToolsArray) = dims(T, :Variable).val
+variableDims(T::ToolsArray) = dims(T, Var).val
 # function timeseries(s::Tuple, dim::Union{Real, Vector, Tuple}=1)
 #     timeseries(s[1], dim) # You gave the metadata as well
 # end
@@ -237,7 +255,7 @@ variableDims(T::ToolsArray) = dims(T, :Variable).val
     times(P::Process; transient::Bool=false)
 Return the time indices of a [`Process`](@ref), optionally including the transient.
 """
-function TimeseriesTools.times(P::Process; transient::Bool=false)
+function TimeseriesBase.times(P::Process; transient::Bool=false)
     if transient
         P.transient_t0:P.savedt:P.tmax
     else
@@ -368,7 +386,7 @@ end
 """
 Retrieve the solution of a [`Process`](@ref) as a [`ToolsArray`](https://rafaqz.github.io/DimensionalData.jl/stable/api/#DimensionalData.ToolsArray), starting from `:t0`, at a sampling period of `:save_dt`. This function will solve the [`Process`](@ref) and populate the `:solution` only if the [`Process`](@ref) has not yet been simulated.
 """
-function TimeSeries(P::Process, dim=1:length(getX0(P)); folder::Union{String,Bool}=(getsolution(P) isa String), kwargs...)
+function TimeseriesBase.Timeseries(P::Process, dim=1:length(getX0(P)); folder::Union{String,Bool}=(getsolution(P) isa String), kwargs...)
     if folder isa Bool && folder
         if getsolution(P) isa String
             folder = getsolution(P)
