@@ -2,11 +2,14 @@
 
 ## [0.3.0]
 
+### Breaking
+- Migrated time-series backend from `TimeseriesTools` to `TimeseriesBase`; dependents must switch packages.
+- Renamed the `TimeSeries` constructor/methods to `Timeseries`/`timeseries`; calls to `TimeSeries(P)`/`TimeSeries(s)` no longer resolve.
+- Variable dimension switched from the `:Variable` symbol to the `Var` type; `dims(T, :Variable)` no longer works (use `Var`).
+- Removed the `DifferentialEquations` `Requires` hook and `src/DifferentialEquations.jl`; the solve functions are now empty stubs (`dsolve`, `odeproblem`, `process2problem`, `process2solution`) and a downstream package must supply methods before a `Process` can be simulated.
+
 ### Changed
-- Migrated time-series backend from `TimeseriesTools` to `TimeseriesBase`.
-- Renamed the `TimeSeries` constructor/methods to `Timeseries`/`timeseries`; `Process` solutions are now built via `TimeseriesBase.Timeseries`.
-- Variable dimension switched from the `:Variable` symbol to the `Var` type.
-- `Process.alg` type widened from `SciMLAlgorithm` to `AbstractSciMLAlgorithm`.
+- `Process.alg` type widened from `SciMLAlgorithm` to `AbstractSciMLAlgorithm` (non-breaking; accepts more).
 - Bumped `DimensionalData` compat.
 - CI: added scheduled and manual (`workflow_dispatch`) triggers.
 
@@ -16,10 +19,7 @@
 - `Base.Dict(::Process; trim)`; the resulting metadata is attached to output `ToolsArray`s.
 
 ### Fixed
-- Unstable/short solutions are now NaN-padded to the expected length instead of erroring or returning truncated series.
-
-### Removed
-- `DifferentialEquations` `Requires` hook and `src/DifferentialEquations.jl` (solve interface moved into `Process.jl`).
+- Unstable/short solutions are now NaN-padded to the expected length instead of erroring or returning truncated series. Note: code relying on the previous error/truncation behaviour will now see trailing `NaN`s.
 
 ## [0.2.3] - 2024-11-26
 
@@ -38,8 +38,10 @@
 
 ## [0.2.1] - 2024-10-16
 
+### Breaking
+- Backend array types moved from `DimArray`/`Ti` to `ToolsArray`/`𝑡`; code dispatching on or indexing by the old types/dims breaks.
+
 ### Changed
-- Backend array types moved from `DimArray`/`Ti` to `ToolsArray`/`𝑡`.
 - Updated for newer package versions; removed `DifferentialEquations` from tests; updated docs Julia version.
 
 ### Fixed
@@ -48,8 +50,10 @@
 
 ## [0.2.0] - 2023-11-24
 
+### Breaking
+- Migrated time-series handling to `TimeseriesTools`: the `timeseries` constructor was renamed `TimeSeries`, `times` is now namespaced under `TimeseriesTools`, and outputs became `DimArray`-backed.
+
 ### Changed
-- Migrated time-series handling to `TimeseriesTools` (`TimeSeries`/`times` namespaced; arrays become `DimArray`-backed).
 - Restructured package layout; moved `PyPlotTools` into `src/Plots/`.
 - Default cap on number of points plotted.
 
