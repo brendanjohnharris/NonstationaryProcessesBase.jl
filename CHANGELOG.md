@@ -1,14 +1,12 @@
 # Changelog
 
-## [0.3.0]
+## [0.2.1]
 
-### Breaking
+### Changed
 - Migrated time-series backend from `TimeseriesTools` to `TimeseriesBase`; dependents must switch packages.
 - Renamed the `TimeSeries` constructor/methods to `Timeseries`/`timeseries`; calls to `TimeSeries(P)`/`TimeSeries(s)` no longer resolve.
 - Variable dimension switched from the `:Variable` symbol to the `Var` type; `dims(T, :Variable)` no longer works (use `Var`).
 - Removed the `DifferentialEquations` `Requires` hook and `src/DifferentialEquations.jl`; the solve functions are now empty stubs (`dsolve`, `odeproblem`, `process2problem`, `process2solution`) and a downstream package must supply methods before a `Process` can be simulated.
-
-### Changed
 - `Process.alg` type widened from `SciMLAlgorithm` to `AbstractSciMLAlgorithm` (non-breaking; accepts more).
 - Bumped `DimensionalData` compat.
 - CI: added scheduled and manual (`workflow_dispatch`) triggers.
