@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.1]
+
+### Changed
+- Widened `TimeseriesBase` compat to 0.2, 0.3.
+- CI: added Julia 1.13.
+
 ## [0.2.1]
 
 ### Changed
